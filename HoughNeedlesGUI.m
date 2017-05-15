@@ -22,7 +22,7 @@ function varargout = HoughNeedlesGUI(varargin)
 
 % Edit the above text to modify the response to help HoughNeedlesGUI
 
-% Last Modified by GUIDE v2.5 15-May-2017 14:17:45
+% Last Modified by GUIDE v2.5 15-May-2017 15:03:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -168,13 +168,16 @@ set(hObject, 'KeyPressFcn', {@CheckKeys,handles});
 SelectMode(hObject,eventdata,handles);
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   KEYBOARD                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function varargout = CheckKeys(hObject,eventdata,handles)
 % This functions receives keypresses and redirects them to the appropriate
 % function: 
 
 % Load cross-function GUI data:
-handles = guidata(hObject)
+handles = guidata(hObject);
 
 % Switch between different key press cases:
 switch eventdata.Key
@@ -242,6 +245,9 @@ switch eventdata.Key
 end
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   OPERATIONAL MODES                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % The following functions don't do much, they just set the GUI in a specific
 % mode and assign the proper callbacks to the mouse buttons and the
@@ -254,7 +260,6 @@ set(hObject,'windowbuttonmotionfcn',{@MouseOverCallback,handles});
 set(hObject,'WindowButtonDownFcn',{@MoveSegment1,handles});
 guidata(hObject,handles);
 
-
 function AddSegmentMode(hObject,eventdata,handles)
 
 handles.mode = 'Add';
@@ -262,8 +267,6 @@ handles.helptext = 'Add a segment by clicking the two extreme points';
 set(hObject,'windowbuttonmotionfcn',{@MouseOverCallback,handles}); 
 set(hObject,'WindowButtonDownFcn',{@Addsegment1,handles});
 guidata(hObject,handles);
-
-
 
 function CutSegmentsMode(hObject,eventdata,handles)
 
@@ -297,6 +300,10 @@ set(hObject,'windowbuttonmotionfcn',{@MouseOverCallback,handles});
 guidata(hObject,handles);
 set(hObject,'WindowButtonDownFcn',{@Fuse2segments1,handles});
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   MOVE CALLBACKS                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % First state of the MoveSegment mode: Once the user clicked a segment, it is
 % stored in handles.selected. Then the proper callbacks are applied (goes to state 2 of the mode)
@@ -400,6 +407,10 @@ end
     
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   ADD CALLBACKS                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % First state of the Addsegment mode: Once the user clicked the first point of the segment,
 % the coordinates are stored in handles.X & handles.Y .The proper callbacks are applied (goes to state 2 of the mode)
 function Addsegment1(hObject,eventdata,handles)
@@ -452,6 +463,11 @@ if X && Y
     UpdateVariables(hObject,eventdata);
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   CUT  CALLBACKS                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Second state of the Cutsegment mode: Once the user clicked where to cut the segment,
 % the segment is cut and the new segments are updated in handles.segments .The proper callbacks are applied (goes back to state 1 of the mode)
 function Cutsegment2(hObject,eventdata,handles)
@@ -486,7 +502,6 @@ if X && Y
     CutSegmentsMode(hObject,eventdata,handles)
 end
 
-
 % First state of the Cutsegment mode: Once the user clicked which segmetn to cut,
 % it is stored in handles.selected.The proper callbacks are applied (goes to state 2 of the mode)
 function Cutsegment1(hObject,eventdata,handles)
@@ -510,6 +525,12 @@ if X && Y
         set(hObject,'WindowButtonDownFcn',{@Cutsegment2,handles});
     end
 end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   FUSE CALLBACKS                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % First state of the Fusesegments mode: Once the user clicked the first segment to fuse,
 % it is stored in handles.selected.The proper callbacks are applied (goes to state 2 of the mode)
@@ -573,6 +594,11 @@ if X && Y
 end
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   DELETE CALLBACK                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % First (and only) state of the deletesegment mode: Once the user clicked a segment segment to delete,
 % it is deleted and handles.segemtns is updated. The callbacks remain
 % unchanged
@@ -604,6 +630,11 @@ UpdateVariables(hObject,eventdata);
 end
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   SELECT CALLBACKS                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % First (and only) state of the selectsegment mode: Once the user clicked a segment, some 
 % information is displayed on the side. The callbacks remain
 % unchanged
@@ -625,6 +656,10 @@ guidata(hObject,handles);
 UpdateVariables(hObject,eventdata);
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   UNDO CALLBACK                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % The Undo function cancels past actions
 function Undo(hObject,eventdata)
@@ -678,6 +713,10 @@ end
 guidata(hObject,handles)
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   MOUSE CALLBACK                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % The MouseoverCallback function highlights overed segment
 function MouseOverCallback(hObject,eventdata,handles)
@@ -745,6 +784,10 @@ guidata(hObject,handles)
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   TEXT CALLBACKS                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Change the variables text box:
 function UpdateVariables(hObject,eventdata)
 handles = guidata(hObject); 
@@ -758,6 +801,10 @@ Stringlist = {['MODE: ' handles.mode]; ['X = ' num2str(handles.X,'%03.f') '; Y =
 set(handles.variables,'String',Stringlist)
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   THRESHOLD                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This function allows to change threshold value. The whole segmentation
 % isn't run again, but you can see the change in the B&W image
@@ -811,7 +858,6 @@ function thresh_Callback(hObject, eventdata, handles)
 
 guidata(hObject,handles);
 UpdateVariables(hObject,eventdata);
-
 
 % Once you have changed the threshold and it seems good for you to run a
 % new segmentation, this function does just it: Re-do teh segmentation it
@@ -877,9 +923,69 @@ set(hObject, 'KeyPressFcn', {@CheckKeys,handles});
 SelectMode(hObject,eventdata,handles);
 
 
-% UTILITIES:
 
-% --- Outputs from this function are returned to the command line.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   HOUGH                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [Segments] = HoughAiguilles(BWt,BW,min_angle_diff)
+
+Thetas = -90:0.125:89.875;
+
+
+% The Hough transform: (Parameters seem optimal, change at your own risk)
+[H,T,R] = hough(BWt,'RhoResolution',1,'Theta',Thetas);
+P = houghpeaks(H,300,'NHoodSize',[15 15],'Threshold',15);
+lines = houghlines(BW,T,R,P,'FillGap',10,'MinLength',20);
+
+
+% For each [theta; rho] pair, find the longest segment:
+MainSegments = 1:length(lines);
+indS = 0;
+while (indS < numel(MainSegments))
+    linelengths = [];
+    indS = indS + 1;
+    % Find segments that lie on the same line, ie segments that have the
+    % same rho and theta:
+    SameRhoTheta = MainSegments(find([lines(MainSegments(:)).theta] == lines(MainSegments(indS)).theta & [lines(MainSegments(:)).rho] == lines(MainSegments(indS)).rho));
+    % for each index of SameRhoTheta, compute the length, or euclidean distance between the two extremities of the segment:
+    for indS2 = SameRhoTheta % A Q&D loop, could be replaced by a matricial function for increased efficiency.
+        linelengths(end+1) = norm(lines(indS2).point1 - lines(indS2).point2);
+    end
+    % Keep only the longest segment, discard others:
+    MainSegments = setdiff(MainSegments,SameRhoTheta(linelengths<max(linelengths)));
+end
+Segments = lines(MainSegments);
+
+function Closesegmentslist = IdentifySimilarSegments(AllSegments)
+% Per needle, the Hough transform identifies several segments. Here we
+% group them together into a cell of lists: Closesegmentslist
+% Identify suspiciously close segments:
+min_angle_diff = 7.5;
+
+IdpdtSegmentslist = 1:numel(AllSegments);
+indC = 0;
+while (indC < numel(IdpdtSegmentslist))
+    indC = indC + 1;
+    Closesegmentslist{indC} = [IdpdtSegmentslist(indC)];
+    Distcs{indC} = 0;
+    for indC2 = (indC+1):numel(IdpdtSegmentslist)
+        ThetaDiff = abs(AllSegments(IdpdtSegmentslist(indC)).theta - AllSegments(IdpdtSegmentslist(indC2)).theta);
+       if (ThetaDiff < min_angle_diff || ThetaDiff > (180-min_angle_diff)) && DistBetween2Segment(AllSegments(IdpdtSegmentslist(indC)).point1,AllSegments(IdpdtSegmentslist(indC)).point2,AllSegments(IdpdtSegmentslist(indC2)).point1,AllSegments(IdpdtSegmentslist(indC2)).point2) < 5
+        Closesegmentslist{indC} = [Closesegmentslist{indC} IdpdtSegmentslist(indC2)];
+       end
+    end
+    if numel(Closesegmentslist{indC}) > 1
+       IdpdtSegmentslist = setdiff(IdpdtSegmentslist,Closesegmentslist{indC}(2:end));
+    end
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   UTILITIES - GEOMETRICAL OPERATIONS              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function varargout = HoughNeedlesGUI_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
@@ -896,17 +1002,12 @@ DATA = [[Nondeleted; s(Nondeleted).theta]; ...
 handles.output = DATA;
 varargout{1} = handles.output;
 
-
-% The T-shaped button just cancels the zoom and pan mode and allows one to
-% resume to the normal modes
-function uipushtool2_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to uipushtool2 (see GCBO)
+function unzoompan_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to unzoompan (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 zoom off
 pan off
-
-
 
 % The following function shamelessly taken from Alec Jacobson's blog:
 % http://www.alecjacobson.com/weblog/?p=1486
@@ -941,13 +1042,336 @@ function [q] = project_point_to_line_segment(A,B,p)
   end
 end
 
-
-
-
-% Finds the nearest of two points to another point.
 function point = nearestpoint(segment,X,Y)
+% Finds the nearest of two points to another point.
 
 d = dist([segment.point1',segment.point2',[X;Y]]);
 d1 = d(1,3);
 d2 = d(2,3);
 [~, point] = min([d1,d2]);
+
+function [distance, varargout] = DistBetween2Segment(p1, p2, p3, p4)
+% Computes the minimum distance between two line segments. Code
+% is adapted for Matlab from Dan Sunday's Geometry Algorithms originally
+% written in C++
+% http://softsurfer.com/Archive/algorithm_0106/algorithm_0106.htm#dist3D_Segment_to_Segment
+
+% Usage: Input the start and end x,y,z coordinates for two line segments. 
+% p1, p2 are [x,y,z] coordinates of first line segment and p3,p4 are for
+% second line segment. 
+
+% Output: scalar minimum distance between the two segments.
+
+%  Example:
+%	P1 = [0 0 0];     P2 = [1 0 0];
+%   P3 = [0 1 0];     P4 = [1 1 0];
+%	dist = DistBetween2Segment(P1, P2, P3, P4)
+%   dist =
+%
+%    1
+% 
+
+
+    u = p1 - p2;
+    v = p3 - p4;
+    w = p2 - p4;
+    
+    a = dot(u,u);
+    b = dot(u,v);
+    c = dot(v,v);
+    d = dot(u,w);
+    e = dot(v,w);
+    D = a*c - b*b;
+    sD = D;
+    tD = D;
+    
+    SMALL_NUM = 0.00000001;
+    
+    % compute the line parameters of the two closest points
+    if (D < SMALL_NUM)  % the lines are almost parallel
+        sN = 0.0;       % force using point P0 on segment S1
+        sD = 1.0;       % to prevent possible division by 0.0 later
+        tN = e;
+        tD = c;
+    else                % get the closest points on the infinite lines
+        sN = (b*e - c*d);
+        tN = (a*e - b*d);
+        if (sN < 0.0)   % sc < 0 => the s=0 edge is visible       
+            sN = 0.0;
+            tN = e;
+            tD = c;
+        elseif (sN > sD)% sc > 1 => the s=1 edge is visible
+            sN = sD;
+            tN = e + b;
+            tD = c;
+        end
+    end
+    
+    if (tN < 0.0)            % tc < 0 => the t=0 edge is visible
+        tN = 0.0;
+        % recompute sc for this edge
+        if (-d < 0.0)
+            sN = 0.0;
+        elseif (-d > a)
+            sN = sD;
+        else
+            sN = -d;
+            sD = a;
+        end
+    elseif (tN > tD)       % tc > 1 => the t=1 edge is visible
+        tN = tD;
+        % recompute sc for this edge
+        if ((-d + b) < 0.0)
+            sN = 0;
+        elseif ((-d + b) > a)
+            sN = sD;
+        else 
+            sN = (-d + b);
+            sD = a;
+        end
+    end
+    
+    % finally do the division to get sc and tc
+    if(abs(sN) < SMALL_NUM)
+        sc = 0.0;
+    else
+        sc = sN / sD;
+    end
+    
+    if(abs(tN) < SMALL_NUM)
+        tc = 0.0;
+    else
+        tc = tN / tD;
+    end
+    
+    % get the difference of the two closest points
+    dP = w + (sc * u) - (tc * v);  % = S1(sc) - S2(tc)
+
+    distance = norm(dP);
+    outV = dP;
+    
+    varargout(1) = {outV};      % vector connecting the closest points
+    varargout(2) = {p2+sc*u};   % Closest point on object 1 
+    varargout(3) = {p4+tc*v};   % Closest point on object 2
+    
+function [NewSegments] = AvgSegment(Closesegmentslist,Segments)
+% This function computes the average segment out of each element of the
+% list of segments described in Closesegmentslist
+
+
+Thetapol = [];
+NewSegments = [];
+for kc = 1:numel(Closesegmentslist)
+    
+    point1s = reshape([Segments(Closesegmentslist{kc}(:)).point1],2,numel(Closesegmentslist{kc}));
+    point2s = reshape([Segments(Closesegmentslist{kc}(:)).point2],2,numel(Closesegmentslist{kc}));
+    Ys = [point1s(2,:) point2s(2,:)];
+    Xs = [point1s(1,:) point2s(1,:)];
+    Xb = mean(Xs);
+    Yb = mean(Ys);
+    b1 = sum((Xs-Xb).*(Ys-Yb))/sum((Xs-Xb).^2);
+    b0 = Yb - b1*Xb;
+    
+    NewSegments(kc).theta = atand(b1);
+    NewSegments(kc).rho = b0;
+
+    Proj = [];
+
+    for k = Closesegmentslist{kc}
+        [P1TH,P1RH] = cart2pol(Segments(k).point1(1),Segments(k).point1(2));
+        [P2TH,P2RH] = cart2pol(Segments(k).point2(1),Segments(k).point2(2));
+        Proj(end+1)  = P1RH*cosd(radtodeg(P1TH)-NewSegments(kc).theta);
+        Proj(end+1)  = P2RH*cosd(radtodeg(P2TH)-NewSegments(kc).theta);
+        Thetapol = [Thetapol P1TH P2TH];
+    end
+
+        [m2, i2] = max(Proj);
+
+        [m1, i1] = min(Proj);
+
+
+    if abs(NewSegments(kc).theta) < 45
+        if mod(i1,2)
+            i1 = ceil(i1/2);
+            NewSegments(kc).point1 = [Segments(Closesegmentslist{kc}(i1)).point1(1) tand(NewSegments(kc).theta)*Segments(Closesegmentslist{kc}(i1)).point1(1) + NewSegments(kc).rho];
+        else
+            i1 = ceil(i1/2);
+            NewSegments(kc).point1 = [Segments(Closesegmentslist{kc}(i1)).point2(1) tand(NewSegments(kc).theta)*Segments(Closesegmentslist{kc}(i1)).point2(1) + NewSegments(kc).rho];
+        end
+        if mod(i2,2)
+            i2 = ceil(i2/2);
+            NewSegments(kc).point2 = [Segments(Closesegmentslist{kc}(i2)).point1(1) tand(NewSegments(kc).theta)*Segments(Closesegmentslist{kc}(i2)).point1(1) + NewSegments(kc).rho];
+        else
+            i2 = ceil(i2/2);
+            NewSegments(kc).point2 = [Segments(Closesegmentslist{kc}(i2)).point2(1) tand(NewSegments(kc).theta)*Segments(Closesegmentslist{kc}(i2)).point2(1) + NewSegments(kc).rho];
+        end
+    else
+        if mod(i1,2)
+            i1 = ceil(i1/2);
+            NewSegments(kc).point1 = [(Segments(Closesegmentslist{kc}(i1)).point1(2) - NewSegments(kc).rho)/tand(NewSegments(kc).theta) Segments(Closesegmentslist{kc}(i1)).point1(2)];
+        else
+            i1 = ceil(i1/2);
+            NewSegments(kc).point1 = [(Segments(Closesegmentslist{kc}(i1)).point2(2) - NewSegments(kc).rho)/tand(NewSegments(kc).theta) Segments(Closesegmentslist{kc}(i1)).point2(2)];;
+        end
+        if mod(i2,2)
+            i2 = ceil(i2/2);
+            NewSegments(kc).point2 = [(Segments(Closesegmentslist{kc}(i2)).point1(2) - NewSegments(kc).rho)/tand(NewSegments(kc).theta) Segments(Closesegmentslist{kc}(i2)).point1(2)];
+        else
+            i2 = ceil(i2/2);
+            NewSegments(kc).point2 = [(Segments(Closesegmentslist{kc}(i2)).point2(2) - NewSegments(kc).rho)/tand(NewSegments(kc).theta) Segments(Closesegmentslist{kc}(i2)).point2(2)];
+        end
+    end
+end
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   UTILITIES - IMAGE PROCESSING                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [CleanImage, BW_Mask, Skeleton] = ImagePreprocessing(CleanImage, ROI, thresh, display)
+% This function takes an image I as an input, provides a cleaner image of
+% that image and extracts the objects mask and skeleton.
+
+
+CloseDisk = strel('Disk',2);
+
+a = mean(CleanImage(ROI));
+
+% Identify regions w/ object and background region
+K = abs(double(CleanImage) - a); % Make the average background value the level 0 of intensity. Anything below that (esp. the needles) will have a value > 0
+M = imgradient(K); % Get the 2D image gradient
+M = (M-min(M(:)))./(max(M(:))-min(M(:))); % Scale M values between 0 & 1
+N = im2bw(M,1.1*(max(M(ROI))/max(M(:)))); % Identify areas with gradient values higher than background and 
+O = imopen(imclose(N,CloseDisk),strel('Disk',4)); % Clean the image a bit
+
+% Use user-given threshold 'thresh' for finer differenciation of background
+% vs. objects
+CleanImage3 = double(CleanImage);
+CleanImage3b = CleanImage3;
+CleanImage3 = imcomplement(CleanImage3);
+CleanImage3(O==0) = 0;
+CleanImage3(CleanImage3b > thresh ) = 0;
+BW_Mask = ones(size(CleanImage3));
+BW_Mask(CleanImage3 == 0) = 0;
+BWo = imopen(BW_Mask,strel('Disk',3));
+BW_Mask = imreconstruct(BWo,BW_Mask);
+BW_Mask = imclose(BW_Mask,strel('Disk',5));   % Here we've got the clean B/W mask of our objects
+Skeleton = bwmorph(BW_Mask,'thin',Inf);       % Get skeleton of the objects
+
+function [Skeleton] = RemoveSegmentsFromSkeleton(Segments,Skeleton)
+% This section removes the identified segments from the image skeleton, to run a
+% second hough transform to identify new segments.
+
+s = size(Skeleton);
+rectW = 3;
+for ind1 = 1:numel(Segments)
+    x = [rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1), rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1)];
+    y = [rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2), rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2)];
+    BWp = poly2mask(x,y,s(1),s(2));
+    Skeleton(BWp) = 0;
+end
+
+function [Selection_Mask] = CreateSelectionMask(Segments,list,s)
+% Create a "mask" that will reference the positions of the needles, to be
+% then used for the mouseover callback to know when we are close to a
+% needle
+
+Selection_Mask = zeros(s);
+rectW = 4;
+for ind1 = list
+    x = [rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1), rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1)];
+    y = [rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2), rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2)];
+    BWp = poly2mask(x,y,s(1),s(2));
+    Selection_Mask(BWp) = ind1;
+end
+
+function [ValuesList] = CreateFluoValuesList(Segments,list,F)
+% Create a list of the needles fluorescence from the fluorescent image.
+
+s = size(F);
+rectW = 1;
+ind2 = 0;
+for ind1 = list
+    ind2 = ind2 + 1;
+    x = [rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point1(1), -rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1), rectW*cosd(Segments(ind1).theta+90)+ Segments(ind1).point2(1)];
+    y = [rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point1(2), -rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2), rectW*sind(Segments(ind1).theta+90)+ Segments(ind1).point2(2)];
+    BWp = poly2mask(x,y,s(1),s(2));
+    ValuesList(ind2) = mean(F(find(BWp)));
+end
+
+function res = grs2rgb(img, map)
+
+%%Convert grayscale images to RGB using specified colormap.
+%	IMG is the grayscale image. Must be specified as a name of the image 
+%	including the directory, or the matrix.
+%	MAP is the M-by-3 matrix of colors.
+%
+%	RES = GRS2RGB(IMG) produces the RGB image RES from the grayscale image IMG 
+%	using the colormap HOT with 64 colors.
+%
+%	RES = GRS2RGB(IMG,MAP) produces the RGB image RES from the grayscale image 
+%	IMG using the colormap matrix MAP. MAP must contain 3 columns for Red, 
+%	Green, and Blue components.  
+%
+%	Example 1:
+%	open 'image.tif';	
+%	res = grs2rgb(image);
+%
+%	Example 2:
+%	cmap = colormap(summer);
+% 	res = grs2rgb('image.tif',cmap);
+%
+% 	See also COLORMAP, HOT
+%
+%	Written by 
+%	Valeriy R. Korostyshevskiy, PhD
+%	Georgetown University Medical Center
+%	Washington, D.C.
+%	December 2006
+%
+% 	vrk@georgetown.edu
+
+% Check the arguments
+if nargin<1
+	error('grs2rgb:missingImage','Specify the name or the matrix of the image');
+end;
+
+if ~exist('map','var') || isempty(map)
+	map = hot(64);
+end;
+
+[l,w] = size(map);
+
+if w~=3
+	error('grs2rgb:wrongColormap','Colormap matrix must contain 3 columns');
+end;
+
+if ischar(img)
+	a = imread(img);
+elseif isnumeric(img)
+	a = img;
+else
+	error('grs2rgb:wrongImageFormat','Image format: must be name or matrix');
+end;
+
+% Calculate the indices of the colormap matrix
+a = double(a);
+a(a==0) = 1; % Needed to produce nonzero index of the colormap matrix
+ci = ceil(l*a/max(a(:))); 
+
+% Colors in the new image
+[il,iw] = size(a);
+r = zeros(il,iw); 
+g = zeros(il,iw);
+b = zeros(il,iw);
+r(:) = map(ci,1);
+g(:) = map(ci,2);
+b(:) = map(ci,3);
+
+% New image
+res = zeros(il,iw,3);
+res(:,:,1) = r; 
+res(:,:,2) = g; 
+res(:,:,3) = b;
